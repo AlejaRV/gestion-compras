@@ -217,6 +217,69 @@ function analyzeRiskAndGaps() {
 }
 
 // =========================================================================
+// MÓDULO 4: Generación Automática de Casos de Prueba Ejecutables (Karate BDD)
+// =========================================================================
+function generateAutomatedTestCases() {
+  console.log('\n⚡ [AI-Engine] Generando Casos de Prueba Automatizados Ejecutables (Karate BDD)...');
+
+  const featureContent = `Feature: Pruebas Generadas Automáticamente por AI-Quality-Engine
+  Como Asistente de Calidad Inteligente
+  Quiero ejecutar los casos de borde, seguridad y volumen sintetizados
+  Para blindar la API contra regresiones y ataques
+
+  Background:
+    * url baseUrl
+    * def pathOrders = '/orders'
+
+  Scenario: [AI-Gen-01] Validar orden con volumen extremo (50 productos)
+    Given path pathOrders
+    And request read('datos-sinteticos-prueba.json').datasetVolume.orders[0]
+    When method post
+    Then status 201
+    And match response.id == '#regex ^[0-9a-f-]{36}$'
+    And match response.estado == 'CREADA'
+    And match response.total == 50000.00
+    And match response.items == '#[50]'
+
+  Scenario: [AI-Gen-02] Rechazar inyección maliciosa de script en nombre de producto
+    Given path pathOrders
+    And request read('datos-sinteticos-prueba.json').datasetSecurity.orders[0]
+    When method post
+    # La API sanitiza y crea la orden o rechaza según política WAF
+    Then status 201
+    And match response.id == '#regex ^[0-9a-f-]{36}$'
+
+  Scenario: [AI-Gen-03] Rechazar orden con cantidad negativa generada por IA
+    Given path pathOrders
+    And request read('datos-sinteticos-prueba.json').datasetNegative.orders[0]
+    When method post
+    Then status 400
+    And match response.title == 'Bad Request'
+
+  Scenario: [AI-Gen-04] Rechazar orden con precio negativo generado por IA
+    Given path pathOrders
+    And request read('datos-sinteticos-prueba.json').datasetNegative.orders[1]
+    When method post
+    Then status 400
+    And match response.title == 'Bad Request'
+
+  Scenario: [AI-Gen-05] Procesar orden con valores límite y alta precisión decimal
+    Given path pathOrders
+    And request read('datos-sinteticos-prueba.json').datasetLimits.orders[0]
+    When method post
+    Then status 201
+    And match response.total == 999998.00
+`;
+
+  const outputPath = path.join(__dirname, 'output', 'generated-ai-orders.feature');
+  fs.writeFileSync(outputPath, featureContent, 'utf8');
+
+  console.log(`✅ Casos de prueba ejecutables generados en: ${outputPath}`);
+  console.log(`🧪 5 Escenarios Karate BDD listos para ser ejecutados en el pipeline.`);
+  return outputPath;
+}
+
+// =========================================================================
 // Ejecución Principal
 // =========================================================================
 function main() {
@@ -230,14 +293,18 @@ function main() {
     generateSyntheticTestData();
   } else if (ACTION === 'risk') {
     analyzeRiskAndGaps();
+  } else if (ACTION === 'tests') {
+    generateAutomatedTestCases();
   } else {
-    // Generar todo
+    // Generar todo el ciclo completo
     generateTraceabilityMatrix();
     generateSyntheticTestData();
     analyzeRiskAndGaps();
+    generateAutomatedTestCases();
   }
 
   console.log('\n✨ Proceso de Ingeniería Asistida por IA completado.');
 }
 
 main();
+
