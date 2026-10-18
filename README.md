@@ -98,18 +98,111 @@ Como Ingeniero de Automatización Senior, más allá de los flujos elementales, 
 
 | Métrica de Calidad | Mínimo Requerido | Resultado Obtenido | Estado |
 | :--- | :---: | :---: | :---: |
-| **Cobertura de Líneas (JaCoCo)** | $\ge 80\%$ | **100% (114/114 líneas mutadas)** | ✅ Superado |
+| **Cobertura de Líneas (JaCoCo)** | $\ge 80\%$ | **100% (114/114 líneas de negocio)** | ✅ Superado |
 | **Cobertura de Ramas (JaCoCo)** | $\ge 80\%$ | **100% (44/44 ramas evaluadas)** | ✅ Superado |
 | **Mutation Score (PITest)** | $\ge 70\%$ | **98% (58 de 59 mutantes matados)** | ✅ Superado |
 | **Pruebas de Aceptación (Karate)** | 4 escenarios | **25 escenarios aprobados (0 fallos)** | ✅ Superado |
 | **Pruebas E2E de UI (Playwright)** | 4 flujos sugeridos | **4 flujos 100% aprobados** | ✅ Superado |
 | **Quality Gates en CI/CD** | Obligatorio | **Automatizado y en verde en GitHub Actions** | ✅ Superado |
 
-### 📸 Evidencias Disponibles en el Repositorio:
-- **Reporte JaCoCo (Cobertura):** [docs/evidence/jacoco-summary.html](docs/evidence/jacoco-summary.html)
+---
+
+## 📑 6. Catálogo Detallado del Suite Completo de Pruebas
+
+Para garantizar máxima transparencia y trazabilidad de ingeniería, a continuación se desglosan todos los casos de prueba ejecutados en la solución:
+
+<details>
+<summary><b>🧪 A. Suite de Pruebas Unitarias y de Integración Slice (125 pruebas) - Clic para desplegar</b></summary>
+
+### 1. `OrderTest.java` (Dominio de la Orden):
+- `[RN-03]` Creación exitosa: genera ID, fija estado en `CREADA`, timestamps y calcula el total automáticamente.
+- `[RN-03]` Precisión monetaria exacta con decimales (`BigDecimal`) sin errores de coma flotante binaria.
+- `[RN-03]` Cálculo correcto con un solo producto y con lista vacía (caso base `0`).
+- `[RN-01]` Rechazo de orden con lista de productos nula o vacía (lanza `InvalidOrderException` con código `RN-01`).
+- Validación de cliente obligatorio, normalización de espacios (`trim`) y rechazo de nombres en blanco.
+- Inmutabilidad y copia defensiva de la lista de productos (`UnsupportedOperationException` ante modificaciones externas).
+- `[RN-06]` Camino feliz completo: `CREADA ➔ PAGADA ➔ ENVIADA ➔ ENTREGADA`.
+- Verificación de que transiciones exitosas actualizan `fechaActualizacion` pero preservan `fechaCreacion`.
+- `[RN-04]` Cancelación permitida desde estados no terminales (`CREADA`, `PAGADA`, `ENVIADA`).
+- `[RN-04]` Rechazo estricto de cancelación de orden en estado `ENTREGADA` (lanza `DeliveredOrderCancellationException`).
+- `[RN-05]` Rechazo estricto de envío de orden en estado `CREADA` no pagada (lanza `OrderNotPaidException`).
+- `[RN-06]` Rechazo de transiciones inválidas con preservación del estado original.
+
+### 2. `OrderStatusTest.java` (Máquina de Estados RN-06):
+- Matriz exhaustiva parametrizada de 25 combinaciones (5x5) evaluando cada transición permitida y denegada.
+- Validación de que ningún estado admite transición hacia `null`.
+- Verificación de estados terminales: `ENTREGADA.isTerminal() == true`, `CANCELADA.isTerminal() == true`.
+- Inmutabilidad de la colección de transiciones permitidas expuesta por cada estado.
+
+### 3. `OrderItemTest.java` (Validaciones de Producto RN-02):
+- Cálculo de subtotal exacto: `cantidad x valorUnitario`.
+- Límite inferior válido: cantidad en `1` y precio mínimo positivo `0.01`.
+- Rechazo de cantidades `<= 0` (`0`, `-1`, `Integer.MIN_VALUE`) con código `RN-02`.
+- Rechazo de precios `<= 0` (`0.00`, `-0.01`, `-100`) y valores nulos con código `RN-02`.
+- Rechazo de IDs de producto nulos, vacíos o solo espacios en blanco.
+
+### 4. `OrderServiceTest.java` (Casos de Uso y Orquestación):
+- Creación de orden persistiendo en repositorio con generador determinista de UUIDs y reloj fijo.
+- Verificación de que ante errores de validación (`RN-01`, `RN-02`) **nunca se invoca `repository.save()`**.
+- Consulta exitosa por ID y lanzamiento de `OrderNotFoundException` (`404`) cuando no existe.
+- Listado general y filtrado exacto por estado (`OrderStatus`).
+- Actualización de estado persistiendo cambios y cancelaciones exitosas.
+- Rechazo de cancelación o envío ilegal garantizando que la orden en memoria no sea modificada.
+
+### 5. `OrderControllerTest.java` (Contrato HTTP y RFC 7807):
+- `POST /orders`: `201 Created` con header `Location` y payload estructurado.
+- `POST /orders`: `400 Bad Request` ante payload vacío o cantidades en 0 con detalles de campo (`errors`).
+- `POST /orders`: `400 Bad Request` ante JSON malformado (`MALFORMED_REQUEST`).
+- `POST /orders`: `415 Unsupported Media Type` ante formatos no JSON.
+- `GET /orders/{id}`: `200 OK` para orden existente y `404 Not Found` para inexistente.
+- `GET /orders/{id}`: `400 Bad Request` ante identificadores que no cumplen formato UUID (`INVALID_PARAMETER`).
+- `PATCH /orders/{id}/status`: `200 OK` en transición válida y `400` ante estados desconocidos.
+- `PATCH /orders/{id}/status`: `400 Bad Request` con código `RN-05` al enviar orden no pagada.
+- `PATCH /orders/{id}/status`: `409 Conflict` con código `RN-06` ante transiciones no permitidas.
+- `DELETE /orders/{id}`: `200 OK` al cancelar y `409 Conflict` (`RN-04`) al intentar cancelar orden entregada.
+- Trazabilidad: Propagación y generación automática del header `X-Correlation-Id`.
+
+</details>
+
+<details>
+<summary><b>🥒 B. Suite de Pruebas de Aceptación con Karate Framework (25 escenarios BDD) - Clic para desplegar</b></summary>
+
+### Escenarios Obligatorios del Reto:
+1. `Crear una orden válida responde 201`: Valida esquema JSON, total calculado (`RN-03`) y header `Location`.
+2. `Consultar una orden existente responde 200`: Crea orden previa y consulta su detalle por ID.
+3. `Intentar enviar una orden no pagada responde 400`: Valida código de regla `RN-05` y que el estado no cambie.
+4. `Intentar cancelar una orden entregada responde 409`: Lleva orden a `ENTREGADA`, intenta `DELETE` y valida `RN-04`.
+
+### Escenarios Adicionales Basados en Análisis de Riesgo:
+5. `Ciclo de vida completo`: Transición secuencial `CREADA ➔ PAGADA ➔ ENVIADA ➔ ENTREGADA` validando integridad del total.
+6-11. `Rechazo de órdenes inválidas (Outline)`: Sin productos, productos nulos, cantidad cero, cantidad negativa, precio cero y cliente vacío (espera `400`).
+12-17. `Rechazo de transiciones prohibidas (Outline)`: `CREADA ➔ ENTREGADA`, `PAGADA ➔ CREADA`, `ENVIADA ➔ PAGADA`, `ENTREGADA ➔ ENVIADA`, `CANCELADA ➔ PAGADA`, `CANCELADA ➔ CANCELADA` (espera `409`).
+18-20. `Cancelación válida en estados intermedios (Outline)`: Cancelar desde `CREADA`, `PAGADA` y `ENVIADA` (espera `200`).
+21. `Consultar orden inexistente`: UUID inexistente responde `404` con código `ORDER_NOT_FOUND`.
+22. `Consultar con ID no UUID`: Parámetro no conformante responde `400` con código `INVALID_PARAMETER`.
+23. `Actualizar a estado desconocido`: Payload con estado `PERDIDA` responde `400` con `MALFORMED_REQUEST`.
+24. `Listar órdenes y filtrar por estado`: Validación de query params `?estado=PAGADA`.
+25. `Trazabilidad de Correlation ID`: Envío de header `X-Correlation-Id` y verificación de retorno idéntico.
+
+</details>
+
+<details>
+<summary><b>🎭 C. Suite de Pruebas E2E de UI con Playwright (4 flujos web) - Clic para desplegar</b></summary>
+
+1. `shouldCreateOrderFromWebUI`: Automatización del formulario web, llenado de cliente, productos y verificación del mensaje visual y tabla.
+2. `shouldSearchOrderById`: Búsqueda interactiva por UUID y verificación del desglose detallado en el DOM.
+3. `shouldUpdateOrderStatus`: Interacción con el botón `Pagar` y verificación reactiva del cambio de badge a `PAGADA`.
+4. `shouldCancelOrder`: Manejo de diálogo nativo `window.confirm`, cancelación y verificación del badge `CANCELADA`.
+
+</details>
+
+---
+
+### 📸 Evidencias Físicas Disponibles en el Repositorio:
+- **Reporte JaCoCo (Cobertura de Código):** [docs/evidence/jacoco-summary.html](docs/evidence/jacoco-summary.html)
 - **Reporte PITest (Mutation Testing):** [docs/evidence/pitest-summary.html](docs/evidence/pitest-summary.html)
-- **Reporte Karate (Aceptación de API):** [docs/evidence/karate-summary.html](docs/evidence/karate-summary.html)
-- **Logs del Pipeline CI/CD:** Visualizables en la pestaña [GitHub Actions del Repositorio](https://github.com/AlejaRV/gestion-compras/actions).
+- **Reporte Karate (Pruebas de Aceptación de API):** [docs/evidence/karate-summary.html](docs/evidence/karate-summary.html)
+- **Ejecución del Pipeline CI/CD:** Visualizable en la pestaña [GitHub Actions del Repositorio](https://github.com/AlejaRV/gestion-compras/actions).
 
 ---
 
