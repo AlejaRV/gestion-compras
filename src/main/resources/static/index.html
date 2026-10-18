@@ -12,7 +12,7 @@
       --card-bg: #FFFFFF;
       --text: #1F2937;
       --text-muted: #6B7280;
-      --border: #E5E7EB;
+      --border: #D1D5DB;
       --error: #EF4444;
       --success: #10B981;
       --info: #3B82F6;
@@ -20,14 +20,14 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding: 2rem 1rem; line-height: 1.5; }
-    .container { max-width: 1000px; margin: 0 auto; }
+    .container { max-width: 1100px; margin: 0 auto; }
     
     header { background: var(--primary-dark); color: #fff; padding: 1.5rem 2rem; border-radius: 12px; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--primary); }
     header h1 { font-size: 1.5rem; font-weight: 700; }
     .badge-api { background: var(--primary); color: #000; font-weight: bold; font-size: 0.8rem; padding: 0.3rem 0.6rem; border-radius: 6px; }
 
     .grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
-    @media (min-width: 768px) { .grid { grid-template-columns: 1fr 1fr; } }
+    @media (min-width: 820px) { .grid { grid-template-columns: 1.2fr 0.8fr; } }
 
     .card { background: var(--card-bg); border-radius: 12px; padding: 1.5rem; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
     .card h2 { font-size: 1.2rem; margin-bottom: 1rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
@@ -39,12 +39,37 @@
 
     .btn { display: inline-block; background: var(--primary-dark); color: #fff; border: none; padding: 0.65rem 1.25rem; font-size: 0.95rem; font-weight: 600; border-radius: 6px; cursor: pointer; transition: opacity 0.2s; }
     .btn:hover { opacity: 0.9; }
-    .btn-sm { padding: 0.3rem 0.6rem; font-size: 0.8rem; }
+    .btn-sm { padding: 0.35rem 0.65rem; font-size: 0.8rem; }
     .btn-danger { background: var(--error); }
     .btn-outline { background: transparent; color: var(--primary-dark); border: 1px solid var(--primary-dark); }
 
-    .product-row { display: grid; grid-template-columns: 2fr 1fr 1.5fr auto; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center; }
-    
+    /* Estructura clara para cada producto con etiquetas legibles */
+    .product-card {
+      background: #F9FAFB;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.9rem;
+      margin-bottom: 0.85rem;
+      position: relative;
+    }
+    .product-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1.5fr auto;
+      gap: 0.75rem;
+      align-items: flex-end;
+    }
+    .product-field label {
+      font-size: 0.78rem;
+      color: #374151;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.3rem;
+    }
+    .product-field input {
+      background: #FFFFFF;
+    }
+
     .status-badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; }
     .status-CREADA { background: #E0E7FF; color: #3730A3; }
     .status-PAGADA { background: #FEF3C7; color: #92400E; }
@@ -57,9 +82,10 @@
     .alert-success { background: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; }
 
     table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-    th, td { text-align: left; padding: 0.75rem 0.5rem; border-bottom: 1px solid var(--border); font-size: 0.875rem; }
-    th { color: var(--text-muted); font-weight: 600; }
-    .actions { display: flex; gap: 0.4rem; }
+    th, td { text-align: left; padding: 0.75rem 0.6rem; border-bottom: 1px solid var(--border); font-size: 0.875rem; vertical-align: middle; }
+    th { color: var(--text-muted); font-weight: 600; background: #FAFAFA; }
+    .actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .item-pill { display: inline-block; background: #EEF2F6; padding: 0.2rem 0.45rem; border-radius: 4px; font-size: 0.75rem; margin-right: 0.25rem; margin-bottom: 0.25rem; font-family: monospace; }
   </style>
 </head>
 <body>
@@ -77,41 +103,63 @@
         <h2>Crear Nueva Orden</h2>
         <form id="order-form" onsubmit="handleCreateOrder(event)">
           <div class="form-group">
-            <label for="cliente-input">Cliente *</label>
-            <input type="text" id="cliente-input" data-testid="cliente-input" required placeholder="Nombre del cliente" />
+            <label for="cliente-input">Nombre del Cliente *</label>
+            <input type="text" id="cliente-input" data-testid="cliente-input" required placeholder="Ej: Juan Pérez" />
           </div>
 
-          <label>Productos (Al menos 1) *</label>
+          <div style="margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+            <label style="margin: 0;">Lista de Productos (Mínimo 1 producto - RN-01) *</label>
+            <button type="button" class="btn btn-sm btn-outline" onclick="addProductRow()">+ Agregar otro producto</button>
+          </div>
+
+          <!-- Contenedor con tarjetas claras por producto -->
           <div id="products-container">
-            <div class="product-row" id="prod-row-0">
-              <input type="text" placeholder="ID (ej: P001)" class="prod-id" data-testid="prod-id-0" required />
-              <input type="number" placeholder="Cant." min="1" value="1" class="prod-cant" data-testid="prod-cant-0" required />
-              <input type="number" placeholder="Valor Unit." min="0.01" step="0.01" value="50000" class="prod-valor" data-testid="prod-valor-0" required />
-              <button type="button" class="btn btn-sm btn-danger" onclick="removeProductRow(0)">✕</button>
+            <div class="product-card" id="prod-row-0">
+              <div class="product-grid">
+                <div class="product-field">
+                  <label for="prod-id-0">Código / ID Producto</label>
+                  <input type="text" id="prod-id-0" placeholder="Ej: P001" class="prod-id" data-testid="prod-id-0" required />
+                </div>
+                <div class="product-field">
+                  <label for="prod-cant-0">Cantidad (RN-02)</label>
+                  <input type="number" id="prod-cant-0" min="1" value="1" class="prod-cant" data-testid="prod-cant-0" required />
+                </div>
+                <div class="product-field">
+                  <label for="prod-valor-0">Precio Unitario ($)</label>
+                  <input type="number" id="prod-valor-0" min="0.01" step="0.01" value="50000" class="prod-valor" data-testid="prod-valor-0" required />
+                </div>
+                <div>
+                  <button type="button" class="btn btn-sm btn-danger" title="Eliminar este producto" onclick="removeProductRow(0)">✕</button>
+                </div>
+              </div>
             </div>
           </div>
-          <button type="button" class="btn btn-sm btn-outline" style="margin-bottom: 1rem;" onclick="addProductRow()">+ Agregar Producto</button>
 
-          <div>
-            <button type="submit" id="btn-crear-orden" data-testid="btn-crear-orden" class="btn" style="width: 100%;">Crear Orden</button>
+          <div style="margin-top: 1rem;">
+            <button type="submit" id="btn-crear-orden" data-testid="btn-crear-orden" class="btn" style="width: 100%;">
+              💾 Crear Orden (Cálculo automático de total - RN-03)
+            </button>
           </div>
         </form>
       </section>
 
       <!-- Consulta por ID -->
       <section class="card">
-        <h2>Consultar Orden por ID</h2>
+        <h2>Consultar Orden por UUID</h2>
         <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-          <input type="text" id="consultar-id-input" data-testid="consultar-id-input" placeholder="UUID de la orden" />
+          <input type="text" id="consultar-id-input" data-testid="consultar-id-input" placeholder="Pegar UUID generado de la orden" />
           <button id="btn-consultar" data-testid="btn-consultar" class="btn" onclick="handleSearchOrder()">Buscar</button>
         </div>
 
-        <div id="order-detail" data-testid="order-detail" style="display: none; background: var(--bg); padding: 1rem; border-radius: 8px;">
-          <p><strong>ID:</strong> <span id="detail-id" data-testid="detail-id"></span></p>
-          <p><strong>Cliente:</strong> <span id="detail-cliente" data-testid="detail-cliente"></span></p>
-          <p><strong>Estado:</strong> <span id="detail-estado" data-testid="detail-estado"></span></p>
-          <p><strong>Total:</strong> $<span id="detail-total" data-testid="detail-total"></span></p>
-          <p><strong>Items:</strong> <span id="detail-items"></span></p>
+        <div id="order-detail" data-testid="order-detail" style="display: none; background: #F9FAFB; padding: 1.2rem; border-radius: 8px; border: 1px solid var(--border);">
+          <p style="margin-bottom: 0.4rem;"><strong>UUID Orden:</strong> <br/><code id="detail-id" data-testid="detail-id" style="font-size: 0.85rem; color: #1E3A8A; word-break: break-all;"></code></p>
+          <p style="margin-bottom: 0.4rem;"><strong>Cliente:</strong> <span id="detail-cliente" data-testid="detail-cliente"></span></p>
+          <p style="margin-bottom: 0.4rem;"><strong>Estado:</strong> <span id="detail-estado" data-testid="detail-estado"></span></p>
+          <p style="margin-bottom: 0.4rem;"><strong>Total Calculado (RN-03):</strong> <strong style="color: #065F46;">$<span id="detail-total" data-testid="detail-total"></span></strong></p>
+          <div style="margin-top: 0.6rem;">
+            <strong>Productos contenidos:</strong>
+            <div id="detail-items" style="margin-top: 0.3rem;"></div>
+          </div>
         </div>
       </section>
     </div>
@@ -119,19 +167,23 @@
     <!-- Listado General de Órdenes -->
     <section class="card" style="margin-top: 2rem;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-        <h2>Listado de Órdenes Registradas</h2>
-        <button class="btn btn-sm btn-outline" onclick="loadOrders()">↻ Actualizar</button>
+        <div>
+          <h2>Listado General de Órdenes</h2>
+          <small style="color: var(--text-muted);">Muestra tanto el UUID asignado a la orden como los IDs y cantidades de cada producto</small>
+        </div>
+        <button class="btn btn-sm btn-outline" onclick="loadOrders()">↻ Actualizar Lista</button>
       </div>
 
       <div style="overflow-x: auto;">
         <table id="orders-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Cliente</th>
-              <th>Total</th>
-              <th>Estado</th>
-              <th>Acciones</th>
+              <th style="width: 22%;">UUID Orden</th>
+              <th style="width: 18%;">Cliente</th>
+              <th style="width: 28%;">Productos (ID / Cant. / Precio)</th>
+              <th style="width: 14%;">Total</th>
+              <th style="width: 8%;">Estado</th>
+              <th style="width: 10%;">Acciones</th>
             </tr>
           </thead>
           <tbody id="orders-tbody" data-testid="orders-tbody">
@@ -150,38 +202,51 @@
       box.className = 'alert ' + (isError ? 'alert-error' : 'alert-success');
       box.textContent = msg;
       box.style.display = 'block';
-      setTimeout(() => { box.style.display = 'none'; }, 5000);
+      setTimeout(() => { box.style.display = 'none'; }, 6000);
     }
 
     function addProductRow() {
       const container = document.getElementById('products-container');
-      const row = document.createElement('div');
-      row.className = 'product-row';
-      row.id = `prod-row-${productIndex}`;
+      const card = document.createElement('div');
+      card.className = 'product-card';
+      card.id = `prod-row-${productIndex}`;
       const idx = productIndex;
-      row.innerHTML = `
-        <input type="text" placeholder="ID" class="prod-id" data-testid="prod-id-${idx}" required />
-        <input type="number" placeholder="Cant." min="1" value="1" class="prod-cant" data-testid="prod-cant-${idx}" required />
-        <input type="number" placeholder="Valor" min="0.01" step="0.01" value="10000" class="prod-valor" data-testid="prod-valor-${idx}" required />
-        <button type="button" class="btn btn-sm btn-danger" onclick="removeProductRow(${idx})">✕</button>
+      card.innerHTML = `
+        <div class="product-grid">
+          <div class="product-field">
+            <label for="prod-id-${idx}">Código / ID Producto</label>
+            <input type="text" id="prod-id-${idx}" placeholder="Ej: P00${idx+1}" class="prod-id" data-testid="prod-id-${idx}" required />
+          </div>
+          <div class="product-field">
+            <label for="prod-cant-${idx}">Cantidad</label>
+            <input type="number" id="prod-cant-${idx}" min="1" value="1" class="prod-cant" data-testid="prod-cant-${idx}" required />
+          </div>
+          <div class="product-field">
+            <label for="prod-valor-${idx}">Precio Unitario ($)</label>
+            <input type="number" id="prod-valor-${idx}" min="0.01" step="0.01" value="25000" class="prod-valor" data-testid="prod-valor-${idx}" required />
+          </div>
+          <div>
+            <button type="button" class="btn btn-sm btn-danger" title="Eliminar este producto" onclick="removeProductRow(${idx})">✕</button>
+          </div>
+        </div>
       `;
-      container.appendChild(row);
+      container.appendChild(card);
       productIndex++;
     }
 
     function removeProductRow(idx) {
       const row = document.getElementById(`prod-row-${idx}`);
-      if (document.querySelectorAll('.product-row').length > 1) {
+      if (document.querySelectorAll('.product-card').length > 1) {
         row.remove();
       } else {
-        showAlert('Debe incluir al menos un producto (RN-01)', true);
+        showAlert('Debe incluir al menos un producto en la orden (RN-01)', true);
       }
     }
 
     async function handleCreateOrder(e) {
       e.preventDefault();
       const cliente = document.getElementById('cliente-input').value.trim();
-      const rows = document.querySelectorAll('.product-row');
+      const rows = document.querySelectorAll('.product-card');
       const productos = [];
 
       rows.forEach(r => {
@@ -200,8 +265,10 @@
         });
         const data = await res.json();
         if (res.ok) {
-          showAlert(`Orden creada con éxito: ${data.id}`);
+          showAlert(`✅ Orden creada con éxito. UUID: ${data.id} - Total: $${Number(data.total).toLocaleString('es-CO')}`);
           document.getElementById('order-form').reset();
+          // Cargar el ID en la caja de consulta para conveniencia
+          document.getElementById('consultar-id-input').value = data.id;
           loadOrders();
         } else {
           showAlert(data.detail || data.title || 'Error al crear la orden', true);
@@ -223,7 +290,17 @@
           document.getElementById('detail-cliente').textContent = data.cliente;
           document.getElementById('detail-estado').innerHTML = `<span class="status-badge status-${data.estado}">${data.estado}</span>`;
           document.getElementById('detail-total').textContent = Number(data.total).toLocaleString('es-CO');
-          document.getElementById('detail-items').textContent = data.productos.map(p => `${p.id} (${p.cantidad}x $${p.valorUnitario})`).join(', ');
+          
+          const itemsContainer = document.getElementById('detail-items');
+          itemsContainer.innerHTML = data.productos.map(p => 
+            `<div class="item-pill" style="display:block; margin-bottom: 0.3rem;">
+              <strong>ID:</strong> ${p.id} &nbsp;|&nbsp; 
+              <strong>Cantidad:</strong> ${p.cantidad} &nbsp;|&nbsp; 
+              <strong>Precio Unit:</strong> $${Number(p.valorUnitario).toLocaleString('es-CO')} &nbsp;|&nbsp; 
+              <strong>Subtotal:</strong> $${Number(p.subtotal).toLocaleString('es-CO')}
+            </div>`
+          ).join('');
+          
           detail.style.display = 'block';
         } else {
           detail.style.display = 'none';
@@ -243,7 +320,7 @@
         });
         const data = await res.json();
         if (res.ok) {
-          showAlert(`Estado actualizado a ${estado}`);
+          showAlert(`Estado de la orden actualizado a ${estado}`);
           loadOrders();
         } else {
           showAlert(data.detail || 'Transición inválida', true);
@@ -277,17 +354,28 @@
         tbody.innerHTML = '';
 
         if (!Array.isArray(orders) || orders.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted);">No hay órdenes registradas.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 2rem;">No hay órdenes registradas actualmente.</td></tr>';
           return;
         }
 
         orders.forEach(o => {
           const tr = document.createElement('tr');
           tr.setAttribute('data-testid', `order-row-${o.id}`);
+          
+          // Formatear la lista de productos dentro de la orden
+          const productosHtml = o.productos && o.productos.length > 0 
+            ? o.productos.map(p => 
+                `<span class="item-pill" title="Subtotal: $${p.subtotal}">
+                  <strong>${p.id}</strong>: ${p.cantidad} x $${Number(p.valorUnitario).toLocaleString('es-CO')}
+                 </span>`
+              ).join(' ')
+            : '<em>Sin productos</em>';
+
           tr.innerHTML = `
-            <td><code>${o.id.substring(0, 8)}...</code></td>
-            <td>${o.cliente}</td>
-            <td><strong>$${Number(o.total).toLocaleString('es-CO')}</strong></td>
+            <td><code title="${o.id}" style="cursor:pointer;" onclick="navigator.clipboard.writeText('${o.id}'); showAlert('UUID copiado al portapapeles');">${o.id.substring(0, 8)}... 📋</code></td>
+            <td><strong>${o.cliente}</strong></td>
+            <td>${productosHtml}</td>
+            <td><strong style="color: #065F46;">$${Number(o.total).toLocaleString('es-CO')}</strong></td>
             <td><span class="status-badge status-${o.estado}" data-testid="status-badge-${o.id}">${o.estado}</span></td>
             <td class="actions">
               ${o.estado === 'CREADA' ? `<button class="btn btn-sm" onclick="updateStatus('${o.id}', 'PAGADA')">Pagar</button>` : ''}
