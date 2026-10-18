@@ -1,5 +1,5 @@
 {
-  "analysisDate": "2026-10-18T05:18:18.557Z",
+  "analysisDate": "2026-10-18T05:48:33.626Z",
   "overallRiskScore": "BAJO (9.2 / 10 - Alta Madurez)",
   "strengthsDetected": [
     "100% de cobertura en líneas y ramas comprobado por JaCoCo.",
