@@ -264,21 +264,6 @@
                     <threads>4</threads>
                 </configuration>
             </plugin>
-            <!-- Serenity BDD Report Generator -->
-            <plugin>
-                <groupId>net.serenity-bdd</groupId>
-                <artifactId>serenity-maven-plugin</artifactId>
-                <version>4.2.16</version>
-                <executions>
-                    <execution>
-                        <id>serenity-reports</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>aggregate</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 </project>

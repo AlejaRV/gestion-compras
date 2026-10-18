@@ -4,13 +4,10 @@
 FROM maven:3.9.9-eclipse-temurin-17-alpine AS builder
 WORKDIR /app
 
-# Copia dependencias y cachea capas
+# Copiar proyecto y compilar empaquetando JAR
 COPY pom.xml .
-RUN mvn dependency:go-offline -B -q
-
-# Copia codigo fuente y compila empaquetando JAR (saltando tests en build de imagen)
 COPY src ./src
-RUN mvn clean package -DskipTests -B -q
+RUN mvn clean package -DskipTests -B -Djacoco.skip=true -Dpitest.skip=true
 
 # ==========================================
 # Etapa 2: Imagen Final Ligera de Ejecucion
@@ -22,7 +19,7 @@ WORKDIR /app
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser:appgroup
 
-# Copiar artefacto final
+# Copiar artefacto final generado en etapa builder
 COPY --from=builder /app/target/order-management-api.jar app.jar
 
 # Variables de entorno y puerto expuesto
