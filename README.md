@@ -57,7 +57,7 @@ Nuestra estrategia concibe la calidad como una responsabilidad transversal y med
 
 ```
           / \
-         / E2E \       --> Serenity BDD + Screenplay (Flujos completos Web UI)
+         / E2E \       --> Playwright & Serenity BDD (Flujos completos Web UI)
         /───────\
        / API BDD \     --> Karate Framework (25 escenarios HTTP de contrato y aceptación)
       /───────────\
@@ -75,6 +75,7 @@ Nuestra estrategia concibe la calidad como una responsabilidad transversal y med
 | **Cobertura de Ramas (JaCoCo)** | $\ge 80\%$ | **100%** | ✅ Superado |
 | **Mutation Score (PITest)** | $\ge 70\%$ | **98% (58/59 matados)** | ✅ Superado |
 | **Pruebas de Aceptación (Karate)** | 4 escenarios | **25 escenarios aprobados** | ✅ Superado |
+| **Pruebas E2E de UI (Playwright)** | 4 flujos sugeridos | **4 flujos 100% aprobados** | ✅ Superado |
 | **Quality Gates en CI/CD** | Obligatorio | **100% automatizado en GitHub Actions** | ✅ Superado |
 
 ---
@@ -122,6 +123,11 @@ mvn pitest:mutationCoverage -DskipITs
 mvn test -Dtest=OrdersAcceptanceIT
 ```
 *Reporte HTML generado en:* `target/karate-reports/karate-summary.html`
+
+### D. Pruebas E2E de UI con Playwright
+```bash
+mvn test -Dtest=OrdersWebPlaywrightIT
+```
 
 ---
 
