@@ -108,7 +108,7 @@
           </div>
 
           <div style="margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-            <label style="margin: 0;">Lista de Productos (Mínimo 1 producto - RN-01) *</label>
+            <label style="margin: 0;">Lista de Productos (Mínimo 1 producto) *</label>
             <button type="button" class="btn btn-sm btn-outline" onclick="addProductRow()">+ Agregar otro producto</button>
           </div>
 
@@ -121,7 +121,7 @@
                   <input type="text" id="prod-id-0" placeholder="Ej: P001" class="prod-id" data-testid="prod-id-0" required />
                 </div>
                 <div class="product-field">
-                  <label for="prod-cant-0">Cantidad (RN-02)</label>
+                  <label for="prod-cant-0">Cantidad</label>
                   <input type="number" id="prod-cant-0" min="1" value="1" class="prod-cant" data-testid="prod-cant-0" required />
                 </div>
                 <div class="product-field">
@@ -137,7 +137,7 @@
 
           <div style="margin-top: 1rem;">
             <button type="submit" id="btn-crear-orden" data-testid="btn-crear-orden" class="btn" style="width: 100%;">
-              💾 Crear Orden (Cálculo automático de total - RN-03)
+              💾 Crear Orden
             </button>
           </div>
         </form>
@@ -145,17 +145,17 @@
 
       <!-- Consulta por ID -->
       <section class="card">
-        <h2>Consultar Orden por UUID</h2>
+        <h2>Consultar Orden por ID</h2>
         <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-          <input type="text" id="consultar-id-input" data-testid="consultar-id-input" placeholder="Pegar UUID generado de la orden" />
+          <input type="text" id="consultar-id-input" data-testid="consultar-id-input" placeholder="Pegar identificador (UUID) de la orden" />
           <button id="btn-consultar" data-testid="btn-consultar" class="btn" onclick="handleSearchOrder()">Buscar</button>
         </div>
 
         <div id="order-detail" data-testid="order-detail" style="display: none; background: #F9FAFB; padding: 1.2rem; border-radius: 8px; border: 1px solid var(--border);">
-          <p style="margin-bottom: 0.4rem;"><strong>UUID Orden:</strong> <br/><code id="detail-id" data-testid="detail-id" style="font-size: 0.85rem; color: #1E3A8A; word-break: break-all;"></code></p>
+          <p style="margin-bottom: 0.4rem;"><strong>ID de la Orden:</strong> <br/><code id="detail-id" data-testid="detail-id" style="font-size: 0.85rem; color: #1E3A8A; word-break: break-all;"></code></p>
           <p style="margin-bottom: 0.4rem;"><strong>Cliente:</strong> <span id="detail-cliente" data-testid="detail-cliente"></span></p>
           <p style="margin-bottom: 0.4rem;"><strong>Estado:</strong> <span id="detail-estado" data-testid="detail-estado"></span></p>
-          <p style="margin-bottom: 0.4rem;"><strong>Total Calculado (RN-03):</strong> <strong style="color: #065F46;">$<span id="detail-total" data-testid="detail-total"></span></strong></p>
+          <p style="margin-bottom: 0.4rem;"><strong>Total:</strong> <strong style="color: #065F46;">$<span id="detail-total" data-testid="detail-total"></span></strong></p>
           <div style="margin-top: 0.6rem;">
             <strong>Productos contenidos:</strong>
             <div id="detail-items" style="margin-top: 0.3rem;"></div>
@@ -239,7 +239,7 @@
       if (document.querySelectorAll('.product-card').length > 1) {
         row.remove();
       } else {
-        showAlert('Debe incluir al menos un producto en la orden (RN-01)', true);
+        showAlert('Debe incluir al menos un producto en la orden', true);
       }
     }
 
