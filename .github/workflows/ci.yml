@@ -37,6 +37,12 @@ jobs:
       - name: 🥒 Ejecutar Pruebas de Aceptación con Karate Framework
         run: mvn test -Dtest=OrdersAcceptanceIT -B
 
+      - name: 🎭 Instalar Navegadores de Playwright
+        run: npx -y playwright install --with-deps chromium
+
+      - name: 🖥️ Ejecutar Pruebas E2E de UI con Playwright
+        run: mvn test -Dtest=OrdersWebPlaywrightIT -B
+
       - name: 📦 Construir Imagen Docker
         run: |
           docker build -t challenge-api:latest .
