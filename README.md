@@ -284,3 +284,58 @@ El archivo [`.github/workflows/ci.yml`](.github/workflows/ci.yml) ejecuta el pip
 5. **Pruebas Playwright:** Instala dependencias del navegador Chromium y ejecuta las pruebas de UI headless.
 6. **Docker Build:** Valida la construcción de la imagen de producción.
 7. **Artefactos:** Publica los reportes HTML de JaCoCo, PITest y Karate para descarga y auditoría.
+
+---
+
+## 🤖 10. Entregable Plus de Innovación: Ingeniería de Calidad Asistida por IA
+
+Como parte del **Plus de Innovación**, se implementó una suite integral de herramientas de IA aplicada a QA y pruebas de software, combinando **Model Context Protocol (MCP)**, **Skills de Agentes**, **GitHub Copilot Instructions**, y arquitectura de agentes con **LangGraph / LangChain**:
+
+```mermaid
+flowchart TD
+    Req[Especificación OpenAPI & RN-01 a RN-06] --> AI_Engine[Motor IA de Calidad\nai-quality-engine.js]
+    AI_Engine --> MCP[Servidor MCP\nmcp_config.json]
+    AI_Engine --> Skills[Skills de Agente\n.agents/skills/qa-quality-assistant]
+    AI_Engine --> Copilot[GitHub Copilot Context\n.github/copilot-instructions.md]
+    
+    MCP --> F1[1. Matriz de Trazabilidad Automática]
+    MCP --> F2[2. Generador de Datos Sintéticos]
+    MCP --> F3[3. Identificación de Escenarios Faltantes]
+    MCP --> F4[4. Recomendaciones Basadas en Riesgo]
+    MCP --> F5[5. Generación de Casos de Prueba]
+```
+
+### Tecnologías de IA Aplicadas:
+- **Model Context Protocol (MCP):** Configuración en [`mcp_config.json`](mcp_config.json) que expone herramientas estándar de QA (`generate_traceability_matrix`, `generate_synthetic_test_data`, `analyze_testing_gaps_and_risk`) a clientes LLM (Claude Desktop, GitHub Copilot Chat, Antigravity IDE).
+- **Skills de Agente:** Definido en [`.agents/skills/qa-quality-assistant/SKILL.md`](.agents/skills/qa-quality-assistant/SKILL.md) para permitir a cualquier agente autónomo ejecutar diagnósticos y generar pruebas bajo demanda.
+- **GitHub Copilot Instructions:** Configurado en [`.github/copilot-instructions.md`](.github/copilot-instructions.md) para gobernar las sugerencias de Copilot según la arquitectura limpia del proyecto, reglas `RN-01` a `RN-06` y estándares de pruebas unitarias/BDD/UI.
+- **Patrón LangGraph / LangChain:** El motor de IA orquesta un grafo de estados determinista (análisis de requerimientos $\to$ extracción de reglas de negocio $\to$ correlación de pruebas $\to$ síntesis de datos $\to$ evaluación de riesgos).
+
+---
+
+### Funcionalidades Demostradas (5 Ejemplos Clave):
+
+| Capacidad | Descripción | Artefacto Generado |
+| :--- | :--- | :--- |
+| **1. Generación de Matrices de Trazabilidad** | Cruza automáticamente cada regla de negocio (`RN-01` a `RN-06`) con sus métodos de prueba unitarios, mutantes de PITest, escenarios Karate y tests Playwright. | [`ai-tools/output/matriz-trazabilidad.json`](ai-tools/output/matriz-trazabilidad.json) |
+| **2. Generación de Datos de Prueba Sintéticos** | Produce datasets para pruebas de borde (límites numéricos, strings largos), seguridad (inyección XSS/SQL), volumen masivo (50 items) y escenarios negativos. | [`ai-tools/output/datos-sinteticos-prueba.json`](ai-tools/output/datos-sinteticos-prueba.json) |
+| **3. Identificación de Escenarios Faltantes** | Detecta gaps en la suite actual (e.g. concurrencia en cancelaciones simultáneas, desconexión de base de datos H2 transaccional). | [`ai-tools/output/recomendaciones-riesgo-ia.json`](ai-tools/output/recomendaciones-riesgo-ia.json) |
+| **4. Recomendaciones Basadas en Riesgo** | Calcula la matriz de impacto vs probabilidad y sugiere prioridades de automatización adicionales (Riesgo Alto, Medio, Bajo). | [`ai-tools/output/recomendaciones-riesgo-ia.json`](ai-tools/output/recomendaciones-riesgo-ia.json) |
+| **5. Generación Automática de Casos de Prueba** | Plantillas guiadas y prompts de Copilot que generan código ejecutable en JUnit 5, Karate Gherkin y Playwright respetando RFC 7807. | [`.github/copilot-instructions.md`](.github/copilot-instructions.md) |
+
+---
+
+### Cómo Ejecutar el Motor de IA Localmente:
+
+El motor no requiere claves de API externas para su modo autónomo de demostración:
+
+```bash
+# Ejecutar la suite completa del asistente de IA:
+node ai-tools/ai-quality-engine.js
+
+# O ejecutar por componente específico:
+node ai-tools/ai-quality-engine.js --action traceability
+node ai-tools/ai-quality-engine.js --action data
+node ai-tools/ai-quality-engine.js --action risk
+```
+

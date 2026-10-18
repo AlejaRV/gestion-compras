@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "qa-quality-assistant": {
+      "command": "node",
+      "args": ["ai-tools/ai-quality-engine.js"],
+      "description": "Servidor MCP para automatización y análisis inteligente de Calidad en el proyecto de Gestión de Órdenes",
+      "capabilities": {
+        "tools": [
+          {
+            "name": "generate_traceability_matrix",
+            "description": "Mapea automáticamente reglas de negocio RN-01 a RN-06 con pruebas unitarias, Karate y Playwright"
+          },
+          {
+            "name": "generate_synthetic_test_data",
+            "description": "Genera datasets sintéticos para pruebas de borde, volumen, seguridad y casos negativos"
+          },
+          {
+            "name": "analyze_testing_gaps_and_risk",
+            "description": "Evalúa el estado de las pruebas y genera recomendaciones de riesgo y cobertura faltante"
+          }
+        ]
+      }
+    }
+  }
+}

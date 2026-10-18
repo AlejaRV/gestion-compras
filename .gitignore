@@ -8,5 +8,4 @@ target/
 __pycache__/
 *.pyc
 .env
-ai-tools/output/
 !docs/evidence/

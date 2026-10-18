@@ -1,0 +1,113 @@
+{
+  "generatedAt": "2026-10-18T05:18:18.554Z",
+  "rules": [
+    {
+      "id": "RN-01",
+      "description": "Una orden debe contener al menos un producto.",
+      "riskLevel": "CRÍTICO",
+      "unitTests": [
+        "OrderTest.orderMustHaveAtLeastOneProduct",
+        "OrderServiceTest.createWithoutProductsDoesNotPersist",
+        "OrderControllerTest.rejectsEmptyProducts"
+      ],
+      "karateScenarios": [
+        "Escenario 06: Rechazar orden inválida sin productos",
+        "Escenario 07: Rechazar orden con lista de productos nula"
+      ],
+      "uiFlows": [
+        "OrdersWebPlaywrightIT: Validación reactiva en formulario"
+      ],
+      "mutationStatus": "MUTANTE KILLED (RemoveConditionalMutator_EQUAL_ELSE)"
+    },
+    {
+      "id": "RN-02",
+      "description": "La cantidad de cada producto debe ser mayor que cero y precio unitario positivo.",
+      "riskLevel": "CRÍTICO",
+      "unitTests": [
+        "OrderItemTest.quantityMustBeGreaterThanZero",
+        "OrderItemTest.unitPriceMustBePositive",
+        "OrderControllerTest.rejectsZeroQuantity"
+      ],
+      "karateScenarios": [
+        "Escenario 08: Rechazar orden con cantidad en cero",
+        "Escenario 09: Rechazar orden con cantidad negativa",
+        "Escenario 10: Rechazar orden con precio en cero"
+      ],
+      "uiFlows": [
+        "OrdersWebPlaywrightIT: Input HTML5 min='1' & min='0.01'"
+      ],
+      "mutationStatus": "MUTANTE KILLED (ConditionalsBoundaryMutator)"
+    },
+    {
+      "id": "RN-03",
+      "description": "El valor total de la orden debe calcularse automáticamente sum(cant * valorUnitario).",
+      "riskLevel": "ALTO (Integridad Financiera)",
+      "unitTests": [
+        "OrderTest.createsOrderWithCalculatedTotal",
+        "OrderTest.totalIsExactWithDecimals",
+        "OrderItemTest.subtotalIsQuantityTimesUnitPrice"
+      ],
+      "karateScenarios": [
+        "Escenario 01: Crear una orden válida responde 201 (valida total)",
+        "Escenario 02: Consultar orden existente valida total"
+      ],
+      "uiFlows": [
+        "OrdersWebPlaywrightIT.shouldSearchOrderById: Valida total en detalle"
+      ],
+      "mutationStatus": "MUTANTE KILLED (MathMutator: multiplicación y suma BigDecimal)"
+    },
+    {
+      "id": "RN-04",
+      "description": "Una orden entregada no puede ser cancelada (retorna 409 Conflict).",
+      "riskLevel": "ALTO (Consistencia de Auditoría)",
+      "unitTests": [
+        "OrderTest.deliveredOrderCannotBeCancelled",
+        "OrderServiceTest.cancelDeliveredOrderFails",
+        "OrderControllerTest.rejectsCancellingDelivered"
+      ],
+      "karateScenarios": [
+        "Escenario 04: Intentar cancelar orden entregada responde 409",
+        "Escenario 18-20: Cancelación exitosa en estados no terminales"
+      ],
+      "uiFlows": [
+        "OrdersWebPlaywrightIT.shouldCancelOrder: Cancelación con confirmación"
+      ],
+      "mutationStatus": "MUTANTE KILLED (NegateConditionalsMutator)"
+    },
+    {
+      "id": "RN-05",
+      "description": "Una orden no puede ser enviada si no ha sido pagada (retorna 400 Bad Request).",
+      "riskLevel": "CRÍTICO (Prevención de Fraude)",
+      "unitTests": [
+        "OrderTest.unpaidOrderCannotBeShipped",
+        "OrderServiceTest.shippingUnpaidOrderFails",
+        "OrderControllerTest.rejectsShippingUnpaid"
+      ],
+      "karateScenarios": [
+        "Escenario 03: Intentar enviar orden no pagada responde 400"
+      ],
+      "uiFlows": [
+        "OrdersWebPlaywrightIT.shouldUpdateOrderStatus: Transición paso a paso CREADA -> PAGADA -> ENVIADA"
+      ],
+      "mutationStatus": "MUTANTE KILLED (RemoveConditionalMutator_EQUAL_IF)"
+    },
+    {
+      "id": "RN-06",
+      "description": "No se deben permitir transiciones inválidas de estado (retorna 409 Conflict).",
+      "riskLevel": "ALTO (Control de Procesos)",
+      "unitTests": [
+        "OrderStatusTest.shouldEvaluateEveryTransition (Matriz 5x5)",
+        "OrderTest.rejectsInvalidTransitions",
+        "OrderControllerTest.rejectsInvalidTransition"
+      ],
+      "karateScenarios": [
+        "Escenario 05: Ciclo de vida completo",
+        "Escenarios 12-17: Rechazo de saltos y reversiones ilegales"
+      ],
+      "uiFlows": [
+        "OrdersWebPlaywrightIT: Botones reactivos según estado actual"
+      ],
+      "mutationStatus": "MUTANTE KILLED (BooleanTrueReturnValsMutator)"
+    }
+  ]
+}

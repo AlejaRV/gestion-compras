@@ -1,0 +1,325 @@
+{
+  "timestamp": "2026-10-18T05:18:18.556Z",
+  "description": "Casos de prueba sintéticos para evaluar robustez y límites de la API de Órdenes",
+  "dataset": [
+    {
+      "id": "CASE-01-HAPPY-PATH",
+      "category": "Camino Feliz Clásico",
+      "cliente": "Empresa Inversiones SAS",
+      "productos": [
+        {
+          "id": "PROD-SERVER-01",
+          "cantidad": 4,
+          "valorUnitario": 3500000
+        },
+        {
+          "id": "PROD-UPS-02",
+          "cantidad": 2,
+          "valorUnitario": 450000.5
+        }
+      ],
+      "expectedTotal": 14900001,
+      "expectedStatus": 201
+    },
+    {
+      "id": "CASE-02-BOUNDARY-MIN",
+      "category": "Valores Límite Inferiores",
+      "cliente": "Ana Minimalista",
+      "productos": [
+        {
+          "id": "P-MICRO",
+          "cantidad": 1,
+          "valorUnitario": 0.01
+        }
+      ],
+      "expectedTotal": 0.01,
+      "expectedStatus": 201
+    },
+    {
+      "id": "CASE-03-VOLUME-ITEMS",
+      "category": "Carga Masiva de Productos (Volumen)",
+      "cliente": "Supermercado Central Mayorista",
+      "productos": [
+        {
+          "id": "SKU-1000",
+          "cantidad": 1,
+          "valorUnitario": 1250.75
+        },
+        {
+          "id": "SKU-1001",
+          "cantidad": 2,
+          "valorUnitario": 2501.5
+        },
+        {
+          "id": "SKU-1002",
+          "cantidad": 3,
+          "valorUnitario": 3752.25
+        },
+        {
+          "id": "SKU-1003",
+          "cantidad": 4,
+          "valorUnitario": 5003
+        },
+        {
+          "id": "SKU-1004",
+          "cantidad": 5,
+          "valorUnitario": 6253.75
+        },
+        {
+          "id": "SKU-1005",
+          "cantidad": 1,
+          "valorUnitario": 7504.5
+        },
+        {
+          "id": "SKU-1006",
+          "cantidad": 2,
+          "valorUnitario": 8755.25
+        },
+        {
+          "id": "SKU-1007",
+          "cantidad": 3,
+          "valorUnitario": 10006
+        },
+        {
+          "id": "SKU-1008",
+          "cantidad": 4,
+          "valorUnitario": 11256.75
+        },
+        {
+          "id": "SKU-1009",
+          "cantidad": 5,
+          "valorUnitario": 12507.5
+        },
+        {
+          "id": "SKU-1010",
+          "cantidad": 1,
+          "valorUnitario": 13758.25
+        },
+        {
+          "id": "SKU-1011",
+          "cantidad": 2,
+          "valorUnitario": 15009
+        },
+        {
+          "id": "SKU-1012",
+          "cantidad": 3,
+          "valorUnitario": 16259.75
+        },
+        {
+          "id": "SKU-1013",
+          "cantidad": 4,
+          "valorUnitario": 17510.5
+        },
+        {
+          "id": "SKU-1014",
+          "cantidad": 5,
+          "valorUnitario": 18761.25
+        },
+        {
+          "id": "SKU-1015",
+          "cantidad": 1,
+          "valorUnitario": 20012
+        },
+        {
+          "id": "SKU-1016",
+          "cantidad": 2,
+          "valorUnitario": 21262.75
+        },
+        {
+          "id": "SKU-1017",
+          "cantidad": 3,
+          "valorUnitario": 22513.5
+        },
+        {
+          "id": "SKU-1018",
+          "cantidad": 4,
+          "valorUnitario": 23764.25
+        },
+        {
+          "id": "SKU-1019",
+          "cantidad": 5,
+          "valorUnitario": 25015
+        },
+        {
+          "id": "SKU-1020",
+          "cantidad": 1,
+          "valorUnitario": 26265.75
+        },
+        {
+          "id": "SKU-1021",
+          "cantidad": 2,
+          "valorUnitario": 27516.5
+        },
+        {
+          "id": "SKU-1022",
+          "cantidad": 3,
+          "valorUnitario": 28767.25
+        },
+        {
+          "id": "SKU-1023",
+          "cantidad": 4,
+          "valorUnitario": 30018
+        },
+        {
+          "id": "SKU-1024",
+          "cantidad": 5,
+          "valorUnitario": 31268.75
+        },
+        {
+          "id": "SKU-1025",
+          "cantidad": 1,
+          "valorUnitario": 32519.5
+        },
+        {
+          "id": "SKU-1026",
+          "cantidad": 2,
+          "valorUnitario": 33770.25
+        },
+        {
+          "id": "SKU-1027",
+          "cantidad": 3,
+          "valorUnitario": 35021
+        },
+        {
+          "id": "SKU-1028",
+          "cantidad": 4,
+          "valorUnitario": 36271.75
+        },
+        {
+          "id": "SKU-1029",
+          "cantidad": 5,
+          "valorUnitario": 37522.5
+        },
+        {
+          "id": "SKU-1030",
+          "cantidad": 1,
+          "valorUnitario": 38773.25
+        },
+        {
+          "id": "SKU-1031",
+          "cantidad": 2,
+          "valorUnitario": 40024
+        },
+        {
+          "id": "SKU-1032",
+          "cantidad": 3,
+          "valorUnitario": 41274.75
+        },
+        {
+          "id": "SKU-1033",
+          "cantidad": 4,
+          "valorUnitario": 42525.5
+        },
+        {
+          "id": "SKU-1034",
+          "cantidad": 5,
+          "valorUnitario": 43776.25
+        },
+        {
+          "id": "SKU-1035",
+          "cantidad": 1,
+          "valorUnitario": 45027
+        },
+        {
+          "id": "SKU-1036",
+          "cantidad": 2,
+          "valorUnitario": 46277.75
+        },
+        {
+          "id": "SKU-1037",
+          "cantidad": 3,
+          "valorUnitario": 47528.5
+        },
+        {
+          "id": "SKU-1038",
+          "cantidad": 4,
+          "valorUnitario": 48779.25
+        },
+        {
+          "id": "SKU-1039",
+          "cantidad": 5,
+          "valorUnitario": 50030
+        },
+        {
+          "id": "SKU-1040",
+          "cantidad": 1,
+          "valorUnitario": 51280.75
+        },
+        {
+          "id": "SKU-1041",
+          "cantidad": 2,
+          "valorUnitario": 52531.5
+        },
+        {
+          "id": "SKU-1042",
+          "cantidad": 3,
+          "valorUnitario": 53782.25
+        },
+        {
+          "id": "SKU-1043",
+          "cantidad": 4,
+          "valorUnitario": 55033
+        },
+        {
+          "id": "SKU-1044",
+          "cantidad": 5,
+          "valorUnitario": 56283.75
+        },
+        {
+          "id": "SKU-1045",
+          "cantidad": 1,
+          "valorUnitario": 57534.5
+        },
+        {
+          "id": "SKU-1046",
+          "cantidad": 2,
+          "valorUnitario": 58785.25
+        },
+        {
+          "id": "SKU-1047",
+          "cantidad": 3,
+          "valorUnitario": 60036
+        },
+        {
+          "id": "SKU-1048",
+          "cantidad": 4,
+          "valorUnitario": 61286.75
+        },
+        {
+          "id": "SKU-1049",
+          "cantidad": 5,
+          "valorUnitario": 62537.5
+        }
+      ],
+      "expectedStatus": 201
+    },
+    {
+      "id": "CASE-04-SECURITY-XSS-INJECTION",
+      "category": "Seguridad y Caracteres Especiales",
+      "cliente": "<script>alert('xss')</script> O'Connor & Co.",
+      "productos": [
+        {
+          "id": "SEC-TAG-<>&'\"",
+          "cantidad": 1,
+          "valorUnitario": 1000
+        }
+      ],
+      "expectedStatus": 201,
+      "notes": "Verifica que caracteres especiales no rompan el parser JSON ni generen inyecciones."
+    },
+    {
+      "id": "CASE-05-CORRUPT-ZERO-QUANTITY",
+      "category": "Negativo / Violación RN-02",
+      "cliente": "Intento Defectuoso",
+      "productos": [
+        {
+          "id": "BAD-QTY",
+          "cantidad": 0,
+          "valorUnitario": 50000
+        }
+      ],
+      "expectedStatus": 400,
+      "expectedError": "RN-02"
+    }
+  ]
+}

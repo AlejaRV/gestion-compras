@@ -1,0 +1,14 @@
+{
+  "name": "ai-qa-agent",
+  "version": "1.0.0",
+  "description": "Herramienta de Ingenieria Asistida por IA para QA: Matriz de Trazabilidad, Generador Sintetico de Datos y Analisis de Riesgo",
+  "main": "ai-quality-engine.js",
+  "scripts": {
+    "traceability": "node ai-quality-engine.js --action traceability",
+    "synthetic-data": "node ai-quality-engine.js --action data",
+    "risk-analysis": "node ai-quality-engine.js --action risk"
+  },
+  "keywords": ["ai", "qa", "mcp", "traceability", "synthetic-data", "risk-based-testing"],
+  "author": "QA Engineering",
+  "license": "MIT"
+}
