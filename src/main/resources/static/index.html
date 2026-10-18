@@ -362,14 +362,23 @@
           const tr = document.createElement('tr');
           tr.setAttribute('data-testid', `order-row-${o.id}`);
           
-          // Formatear la lista de productos dentro de la orden
+          // Formatear la lista de productos de manera completamente clara y legible
           const productosHtml = o.productos && o.productos.length > 0 
-            ? o.productos.map(p => 
-                `<span class="item-pill" title="Subtotal: $${p.subtotal}">
-                  <strong>${p.id}</strong>: ${p.cantidad} x $${Number(p.valorUnitario).toLocaleString('es-CO')}
-                 </span>`
-              ).join(' ')
-            : '<em>Sin productos</em>';
+            ? o.productos.map(p => {
+                const subtotal = p.subtotal !== undefined ? p.subtotal : (p.cantidad * p.valorUnitario);
+                return `
+                <div style="background: #F3F4F6; border: 1px solid #E5E7EB; border-radius: 6px; padding: 0.35rem 0.6rem; margin-bottom: 0.35rem; font-size: 0.8rem; display: inline-block; min-width: 220px;">
+                  <div><span style="color:#6B7280; font-size:0.7rem; font-weight:700;">PRODUCTO:</span> <strong>${p.id}</strong></div>
+                  <div style="color: #374151;">
+                    <span style="color:#6B7280; font-size:0.7rem;">CANTIDAD:</span> <strong>${p.cantidad}</strong> &nbsp;|&nbsp;
+                    <span style="color:#6B7280; font-size:0.7rem;">PRECIO:</span> <strong>$${Number(p.valorUnitario).toLocaleString('es-CO', {minimumFractionDigits: 2})}</strong>
+                  </div>
+                  <div style="color: #059669; font-weight: 600; font-size: 0.75rem;">
+                    Subtotal: $${Number(subtotal).toLocaleString('es-CO', {minimumFractionDigits: 2})}
+                  </div>
+                </div>`;
+              }).join('')
+            : '<em style="color: #9CA3AF;">Sin productos</em>';
 
           tr.innerHTML = `
             <td><code title="${o.id}" style="cursor:pointer;" onclick="navigator.clipboard.writeText('${o.id}'); showAlert('UUID copiado al portapapeles');">${o.id.substring(0, 8)}... 📋</code></td>
