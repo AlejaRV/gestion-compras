@@ -29,7 +29,7 @@ jobs:
         run: mvn test -DskipITs -B
 
       - name: "📊 Quality Gate - Verificar Cobertura JaCoCo (Líneas y Ramas >= 80%)"
-        run: mvn jacoco:check -B
+        run: mvn jacoco:report jacoco:check -B
 
       - name: "🧬 Quality Gate - Mutation Testing con PITest (Score >= 70%)"
         run: mvn pitest:mutationCoverage -DskipITs -B
