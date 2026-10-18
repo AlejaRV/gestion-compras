@@ -276,14 +276,26 @@ docker compose up --build -d
 
 ## 🔄 9. Pipeline de CI/CD (GitHub Actions)
 
-El archivo [`.github/workflows/ci.yml`](.github/workflows/ci.yml) ejecuta el pipeline completo en cada `push` o `pull request` hacia `main`:
-1. **Build & Compile:** Compilación en Java 17 Temurin con cache de dependencias.
-2. **Quality Gate Cobertura:** Ejecuta JaCoCo y falla el build si `LINE` o `BRANCH` son menores al 80%.
-3. **Quality Gate Mutación:** Ejecuta PITest con umbral de fallo estricto al 70%.
-4. **Pruebas Karate:** Ejecuta la suite de aceptación levantando la app en puerto aleatorio.
-5. **Pruebas Playwright:** Instala dependencias del navegador Chromium y ejecuta las pruebas de UI headless.
-6. **Docker Build:** Valida la construcción de la imagen de producción.
-7. **Artefactos:** Publica los reportes HTML de JaCoCo, PITest y Karate para descarga y auditoría.
+El pipeline de integración y entrega continua se encuentra completamente automatizado bajo el archivo [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+
+> [!TIP]
+> ### 🔎 ¿Dónde ver la ejecución y comportamiento del Pipeline en vivo?
+> Puedes consultar el historial completo de ejecuciones, logs paso a paso de cada prueba y descargar los artefactos directamente en la pestaña **Actions** de GitHub:  
+> 👉 **[Ver Ejecución del Pipeline en GitHub Actions](https://github.com/AlejaRV/gestion-compras/actions)**
+> 
+> *Cada `push` o `pull request` hacia la rama `main` dispara la suite completa y valida los Quality Gates de forma obligatoria.*
+
+### Flujo y Comportamiento del Pipeline:
+1. **📥 Checkout del Código:** Clona el repositorio con `actions/checkout@v4`.
+2. **☕ Configuración Java 17:** Prepara el entorno con JDK Temurin 17 y cache inteligente de dependencias Maven.
+3. **🔨 Compilación:** Ejecuta `mvn clean compile -B` para validar la integridad del código fuente.
+4. **🧪 Pruebas Unitarias:** Ejecuta las 125 pruebas de JUnit 5 + Mockito (`mvn test -DskipITs -B`).
+5. **📊 Quality Gate de Cobertura (JaCoCo):** Genera el reporte y ejecuta `mvn jacoco:report jacoco:check -B`. Falla el build inmediatamente si la cobertura de líneas o ramas es menor al 80%. *(Resultado obtenido: 100%)*.
+6. **🧬 Quality Gate de Mutation Testing (PITest):** Ejecuta `mvn pitest:mutationCoverage -DskipITs -B`. Inyecta mutantes y falla si el Mutation Score es menor al 70%. *(Resultado obtenido: 98%)*.
+7. **🥒 Pruebas de Aceptación (Karate BDD):** Ejecuta `mvn test -Dtest=OrdersAcceptanceIT -B` levantando la API en puerto dinámico y corriendo los 25 escenarios.
+8. **🎭 Pruebas E2E de UI (Playwright):** Instala el binario headless de Chromium (`npx -y playwright install --with-deps chromium`) y ejecuta los 4 flujos de interfaz web (`OrdersWebPlaywrightIT`).
+9. **📦 Construcción Docker:** Construye la imagen de producción en contenedor multi-stage (`docker build -t challenge-api:latest .`) y verifica la etiqueta generada.
+10. **📤 Publicación de Artefactos de Auditoría:** Sube automáticamente los reportes HTML navegables de JaCoCo, PITest y Karate para su descarga en GitHub.
 
 ---
 
