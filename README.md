@@ -165,24 +165,36 @@ Para garantizar máxima transparencia y trazabilidad de ingeniería, a continuac
 </details>
 
 <details>
-<summary><b>🥒 B. Suite de Pruebas de Aceptación con Karate Framework (25 escenarios BDD) - Clic para desplegar</b></summary>
+<summary><b>🥒 B. Suite de Pruebas de Aceptación con Karate Framework (Los 25 escenarios BDD listados individualmente) - Clic para desplegar</b></summary>
 
 ### Escenarios Obligatorios del Reto:
-1. `Crear una orden válida responde 201`: Valida esquema JSON, total calculado (`RN-03`) y header `Location`.
-2. `Consultar una orden existente responde 200`: Crea orden previa y consulta su detalle por ID.
-3. `Intentar enviar una orden no pagada responde 400`: Valida código de regla `RN-05` y que el estado no cambie.
-4. `Intentar cancelar una orden entregada responde 409`: Lleva orden a `ENTREGADA`, intenta `DELETE` y valida `RN-04`.
+1. `Escenario 01: Crear una orden válida responde 201` -> Valida esquema JSON, cálculo de total (`RN-03`) y header `Location`.
+2. `Escenario 02: Consultar una orden existente responde 200` -> Precondición de orden creada y consulta exitosa por ID.
+3. `Escenario 03: Intentar enviar una orden no pagada responde 400` -> Valida violación de regla `RN-05` y estado inmutable (`CREADA`).
+4. `Escenario 04: Intentar cancelar una orden entregada responde 409` -> Valida violación de regla `RN-04` y estado inmutable (`ENTREGADA`).
 
 ### Escenarios Adicionales Basados en Análisis de Riesgo:
-5. `Ciclo de vida completo`: Transición secuencial `CREADA ➔ PAGADA ➔ ENVIADA ➔ ENTREGADA` validando integridad del total.
-6-11. `Rechazo de órdenes inválidas (Outline)`: Sin productos, productos nulos, cantidad cero, cantidad negativa, precio cero y cliente vacío (espera `400`).
-12-17. `Rechazo de transiciones prohibidas (Outline)`: `CREADA ➔ ENTREGADA`, `PAGADA ➔ CREADA`, `ENVIADA ➔ PAGADA`, `ENTREGADA ➔ ENVIADA`, `CANCELADA ➔ PAGADA`, `CANCELADA ➔ CANCELADA` (espera `409`).
-18-20. `Cancelación válida en estados intermedios (Outline)`: Cancelar desde `CREADA`, `PAGADA` y `ENVIADA` (espera `200`).
-21. `Consultar orden inexistente`: UUID inexistente responde `404` con código `ORDER_NOT_FOUND`.
-22. `Consultar con ID no UUID`: Parámetro no conformante responde `400` con código `INVALID_PARAMETER`.
-23. `Actualizar a estado desconocido`: Payload con estado `PERDIDA` responde `400` con `MALFORMED_REQUEST`.
-24. `Listar órdenes y filtrar por estado`: Validación de query params `?estado=PAGADA`.
-25. `Trazabilidad de Correlation ID`: Envío de header `X-Correlation-Id` y verificación de retorno idéntico.
+5. `Escenario 05: Ciclo de vida completo transicional` -> `CREADA ➔ PAGADA ➔ ENVIADA ➔ ENTREGADA` validando consistencia del total.
+6. `Escenario 06: Rechazar orden inválida sin productos` -> Payload `{ productos: [] }` responde `400` (`RN-01`).
+7. `Escenario 07: Rechazar orden con lista de productos nula` -> Payload `{ cliente: 'Ana' }` responde `400` (`RN-01`).
+8. `Escenario 08: Rechazar orden con cantidad en cero` -> Payload con `cantidad: 0` responde `400` (`RN-02`).
+9. `Escenario 09: Rechazar orden con cantidad negativa` -> Payload con `cantidad: -5` responde `400` (`RN-02`).
+10. `Escenario 10: Rechazar orden con precio unitario en cero` -> Payload con `valorUnitario: 0` responde `400` (`RN-02`).
+11. `Escenario 11: Rechazar orden con nombre de cliente vacío` -> Payload con `cliente: ''` responde `400` (`VALIDATION_ERROR`).
+12. `Escenario 12: Rechazar transición prohibida CREADA -> ENTREGADA` -> Intento de salto de ciclo responde `409` (`RN-06`).
+13. `Escenario 13: Rechazar transición prohibida PAGADA -> CREADA` -> Intento de reversión de pago responde `409` (`RN-06`).
+14. `Escenario 14: Rechazar transición prohibida ENVIADA -> PAGADA` -> Intento de reversión de envío responde `409` (`RN-06`).
+15. `Escenario 15: Rechazar transición prohibida ENTREGADA -> ENVIADA` -> Estado terminal no permite cambios, responde `409` (`RN-06`).
+16. `Escenario 16: Rechazar transición prohibida CANCELADA -> PAGADA` -> Estado terminal cancelado no permite reactivación, responde `409` (`RN-06`).
+17. `Escenario 17: Rechazar transición prohibida CANCELADA -> CANCELADA` -> Intento redundante sobre orden cancelada responde `409` (`RN-06`).
+18. `Escenario 18: Cancelación exitosa de orden en estado CREADA` -> `DELETE /orders/{id}` responde `200` y estado `CANCELADA`.
+19. `Escenario 19: Cancelación exitosa de orden en estado PAGADA` -> `DELETE /orders/{id}` responde `200` y estado `CANCELADA`.
+20. `Escenario 20: Cancelación exitosa de orden en estado ENVIADA` -> `DELETE /orders/{id}` responde `200` y estado `CANCELADA`.
+21. `Escenario 21: Consultar orden inexistente por UUID no registrado` -> `GET /orders/00000000-...` responde `404` (`ORDER_NOT_FOUND`).
+22. `Escenario 22: Consultar con identificador no conformante` -> `GET /orders/no-es-un-uuid` responde `400` (`INVALID_PARAMETER`).
+23. `Escenario 23: Actualizar a un estado inexistente o inventado` -> `PATCH /orders/{id}/status` con `PERDIDA` responde `400` (`MALFORMED_REQUEST`).
+24. `Escenario 24: Listar órdenes con filtro dinámico por estado` -> `GET /orders?estado=PAGADA` valida filtrado exacto.
+25. `Escenario 25: Observabilidad y trazabilidad de Correlation ID` -> Envío de `X-Correlation-Id` y verificación de eco en cabeceras.
 
 </details>
 
