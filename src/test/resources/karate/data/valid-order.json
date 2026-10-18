@@ -1,0 +1,7 @@
+{
+  "cliente": "Juan Pérez",
+  "productos": [
+    { "id": "P001", "cantidad": 2, "valorUnitario": 100000 },
+    { "id": "P002", "cantidad": 3, "valorUnitario": 15000 }
+  ]
+}

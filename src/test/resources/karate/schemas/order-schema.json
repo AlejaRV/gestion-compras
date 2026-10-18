@@ -1,0 +1,9 @@
+{
+  "id": "#uuid",
+  "cliente": "#string",
+  "productos": "#[_ > 0]",
+  "total": "#number",
+  "estado": "#regex (CREADA|PAGADA|ENVIADA|ENTREGADA|CANCELADA)",
+  "fechaCreacion": "#string",
+  "fechaActualizacion": "#string"
+}

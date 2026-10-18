@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Órdenes de Compra</title>
+  <style>
+    :root {
+      --primary: #FDDA24; /* Bancolombia Yellow tone */
+      --primary-dark: #2C2A29;
+      --bg: #F5F7FA;
+      --card-bg: #FFFFFF;
+      --text: #1F2937;
+      --text-muted: #6B7280;
+      --border: #E5E7EB;
+      --error: #EF4444;
+      --success: #10B981;
+      --info: #3B82F6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 2rem 1rem; line-height: 1.5; }
+    .container { max-width: 1000px; margin: 0 auto; }
+    
+    header { background: var(--primary-dark); color: #fff; padding: 1.5rem 2rem; border-radius: 12px; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid var(--primary); }
+    header h1 { font-size: 1.5rem; font-weight: 700; }
+    .badge-api { background: var(--primary); color: #000; font-weight: bold; font-size: 0.8rem; padding: 0.3rem 0.6rem; border-radius: 6px; }
+
+    .grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+    @media (min-width: 768px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+    .card { background: var(--card-bg); border-radius: 12px; padding: 1.5rem; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+    .card h2 { font-size: 1.2rem; margin-bottom: 1rem; border-bottom: 2px solid var(--border); padding-bottom: 0.5rem; }
+
+    .form-group { margin-bottom: 1rem; }
+    label { display: block; font-size: 0.875rem; font-weight: 600; margin-bottom: 0.25rem; }
+    input, select { width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; }
+    input:focus, select:focus { outline: none; border-color: var(--primary-dark); }
+
+    .btn { display: inline-block; background: var(--primary-dark); color: #fff; border: none; padding: 0.65rem 1.25rem; font-size: 0.95rem; font-weight: 600; border-radius: 6px; cursor: pointer; transition: opacity 0.2s; }
+    .btn:hover { opacity: 0.9; }
+    .btn-sm { padding: 0.3rem 0.6rem; font-size: 0.8rem; }
+    .btn-danger { background: var(--error); }
+    .btn-outline { background: transparent; color: var(--primary-dark); border: 1px solid var(--primary-dark); }
+
+    .product-row { display: grid; grid-template-columns: 2fr 1fr 1.5fr auto; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center; }
+    
+    .status-badge { display: inline-block; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: bold; }
+    .status-CREADA { background: #E0E7FF; color: #3730A3; }
+    .status-PAGADA { background: #FEF3C7; color: #92400E; }
+    .status-ENVIADA { background: #DBEAFE; color: #1E40AF; }
+    .status-ENTREGADA { background: #D1FAE5; color: #065F46; }
+    .status-CANCELADA { background: #FEE2E2; color: #991B1B; }
+
+    .alert { padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 1rem; display: none; font-size: 0.9rem; font-weight: 500; }
+    .alert-error { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; }
+    .alert-success { background: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { text-align: left; padding: 0.75rem 0.5rem; border-bottom: 1px solid var(--border); font-size: 0.875rem; }
+    th { color: var(--text-muted); font-weight: 600; }
+    .actions { display: flex; gap: 0.4rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📦 Gestión de Órdenes</h1>
+      <span class="badge-api">QA Engineering API v1.0</span>
+    </header>
+
+    <div id="alert-box" class="alert"></div>
+
+    <div class="grid">
+      <!-- Formulario Crear Orden -->
+      <section class="card">
+        <h2>Crear Nueva Orden</h2>
+        <form id="order-form" onsubmit="handleCreateOrder(event)">
+          <div class="form-group">
+            <label for="cliente-input">Cliente *</label>
+            <input type="text" id="cliente-input" data-testid="cliente-input" required placeholder="Nombre del cliente" />
+          </div>
+
+          <label>Productos (Al menos 1) *</label>
+          <div id="products-container">
+            <div class="product-row" id="prod-row-0">
+              <input type="text" placeholder="ID (ej: P001)" class="prod-id" data-testid="prod-id-0" required />
+              <input type="number" placeholder="Cant." min="1" value="1" class="prod-cant" data-testid="prod-cant-0" required />
+              <input type="number" placeholder="Valor Unit." min="0.01" step="0.01" value="50000" class="prod-valor" data-testid="prod-valor-0" required />
+              <button type="button" class="btn btn-sm btn-danger" onclick="removeProductRow(0)">✕</button>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline" style="margin-bottom: 1rem;" onclick="addProductRow()">+ Agregar Producto</button>
+
+          <div>
+            <button type="submit" id="btn-crear-orden" data-testid="btn-crear-orden" class="btn" style="width: 100%;">Crear Orden</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Consulta por ID -->
+      <section class="card">
+        <h2>Consultar Orden por ID</h2>
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+          <input type="text" id="consultar-id-input" data-testid="consultar-id-input" placeholder="UUID de la orden" />
+          <button id="btn-consultar" data-testid="btn-consultar" class="btn" onclick="handleSearchOrder()">Buscar</button>
+        </div>
+
+        <div id="order-detail" data-testid="order-detail" style="display: none; background: var(--bg); padding: 1rem; border-radius: 8px;">
+          <p><strong>ID:</strong> <span id="detail-id" data-testid="detail-id"></span></p>
+          <p><strong>Cliente:</strong> <span id="detail-cliente" data-testid="detail-cliente"></span></p>
+          <p><strong>Estado:</strong> <span id="detail-estado" data-testid="detail-estado"></span></p>
+          <p><strong>Total:</strong> $<span id="detail-total" data-testid="detail-total"></span></p>
+          <p><strong>Items:</strong> <span id="detail-items"></span></p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Listado General de Órdenes -->
+    <section class="card" style="margin-top: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <h2>Listado de Órdenes Registradas</h2>
+        <button class="btn btn-sm btn-outline" onclick="loadOrders()">↻ Actualizar</button>
+      </div>
+
+      <div style="overflow-x: auto;">
+        <table id="orders-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Cliente</th>
+              <th>Total</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="orders-tbody" data-testid="orders-tbody">
+            <!-- Renderizado dinámico -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    let productIndex = 1;
+
+    function showAlert(msg, isError = false) {
+      const box = document.getElementById('alert-box');
+      box.className = 'alert ' + (isError ? 'alert-error' : 'alert-success');
+      box.textContent = msg;
+      box.style.display = 'block';
+      setTimeout(() => { box.style.display = 'none'; }, 5000);
+    }
+
+    function addProductRow() {
+      const container = document.getElementById('products-container');
+      const row = document.createElement('div');
+      row.className = 'product-row';
+      row.id = `prod-row-${productIndex}`;
+      const idx = productIndex;
+      row.innerHTML = `
+        <input type="text" placeholder="ID" class="prod-id" data-testid="prod-id-${idx}" required />
+        <input type="number" placeholder="Cant." min="1" value="1" class="prod-cant" data-testid="prod-cant-${idx}" required />
+        <input type="number" placeholder="Valor" min="0.01" step="0.01" value="10000" class="prod-valor" data-testid="prod-valor-${idx}" required />
+        <button type="button" class="btn btn-sm btn-danger" onclick="removeProductRow(${idx})">✕</button>
+      `;
+      container.appendChild(row);
+      productIndex++;
+    }
+
+    function removeProductRow(idx) {
+      const row = document.getElementById(`prod-row-${idx}`);
+      if (document.querySelectorAll('.product-row').length > 1) {
+        row.remove();
+      } else {
+        showAlert('Debe incluir al menos un producto (RN-01)', true);
+      }
+    }
+
+    async function handleCreateOrder(e) {
+      e.preventDefault();
+      const cliente = document.getElementById('cliente-input').value.trim();
+      const rows = document.querySelectorAll('.product-row');
+      const productos = [];
+
+      rows.forEach(r => {
+        productos.push({
+          id: r.querySelector('.prod-id').value.trim(),
+          cantidad: parseInt(r.querySelector('.prod-cant').value, 10),
+          valorUnitario: parseFloat(r.querySelector('.prod-valor').value)
+        });
+      });
+
+      try {
+        const res = await fetch('/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cliente, productos })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showAlert(`Orden creada con éxito: ${data.id}`);
+          document.getElementById('order-form').reset();
+          loadOrders();
+        } else {
+          showAlert(data.detail || data.title || 'Error al crear la orden', true);
+        }
+      } catch (err) {
+        showAlert('Error de conexión con la API', true);
+      }
+    }
+
+    async function handleSearchOrder() {
+      const id = document.getElementById('consultar-id-input').value.trim();
+      if (!id) return;
+      try {
+        const res = await fetch(`/orders/${id}`);
+        const data = await res.json();
+        const detail = document.getElementById('order-detail');
+        if (res.ok) {
+          document.getElementById('detail-id').textContent = data.id;
+          document.getElementById('detail-cliente').textContent = data.cliente;
+          document.getElementById('detail-estado').innerHTML = `<span class="status-badge status-${data.estado}">${data.estado}</span>`;
+          document.getElementById('detail-total').textContent = Number(data.total).toLocaleString('es-CO');
+          document.getElementById('detail-items').textContent = data.productos.map(p => `${p.id} (${p.cantidad}x $${p.valorUnitario})`).join(', ');
+          detail.style.display = 'block';
+        } else {
+          detail.style.display = 'none';
+          showAlert(data.detail || 'Orden no encontrada', true);
+        }
+      } catch (err) {
+        showAlert('Error consultando la orden', true);
+      }
+    }
+
+    async function updateStatus(id, estado) {
+      try {
+        const res = await fetch(`/orders/${id}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ estado })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showAlert(`Estado actualizado a ${estado}`);
+          loadOrders();
+        } else {
+          showAlert(data.detail || 'Transición inválida', true);
+        }
+      } catch (err) {
+        showAlert('Error actualizando estado', true);
+      }
+    }
+
+    async function cancelOrder(id) {
+      if (!confirm('¿Desea cancelar esta orden?')) return;
+      try {
+        const res = await fetch(`/orders/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (res.ok) {
+          showAlert(`Orden cancelada con éxito`);
+          loadOrders();
+        } else {
+          showAlert(data.detail || 'No se pudo cancelar la orden', true);
+        }
+      } catch (err) {
+        showAlert('Error cancelando orden', true);
+      }
+    }
+
+    async function loadOrders() {
+      try {
+        const res = await fetch('/orders');
+        const orders = await res.json();
+        const tbody = document.getElementById('orders-tbody');
+        tbody.innerHTML = '';
+
+        if (!Array.isArray(orders) || orders.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted);">No hay órdenes registradas.</td></tr>';
+          return;
+        }
+
+        orders.forEach(o => {
+          const tr = document.createElement('tr');
+          tr.setAttribute('data-testid', `order-row-${o.id}`);
+          tr.innerHTML = `
+            <td><code>${o.id.substring(0, 8)}...</code></td>
+            <td>${o.cliente}</td>
+            <td><strong>$${Number(o.total).toLocaleString('es-CO')}</strong></td>
+            <td><span class="status-badge status-${o.estado}" data-testid="status-badge-${o.id}">${o.estado}</span></td>
+            <td class="actions">
+              ${o.estado === 'CREADA' ? `<button class="btn btn-sm" onclick="updateStatus('${o.id}', 'PAGADA')">Pagar</button>` : ''}
+              ${o.estado === 'PAGADA' ? `<button class="btn btn-sm" onclick="updateStatus('${o.id}', 'ENVIADA')">Enviar</button>` : ''}
+              ${o.estado === 'ENVIADA' ? `<button class="btn btn-sm" onclick="updateStatus('${o.id}', 'ENTREGADA')">Entregar</button>` : ''}
+              ${o.estado !== 'ENTREGADA' && o.estado !== 'CANCELADA' ? `<button class="btn btn-sm btn-danger" onclick="cancelOrder('${o.id}')">Cancelar</button>` : ''}
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error('Error cargando órdenes', err);
+      }
+    }
+
+    // Carga inicial
+    loadOrders();
+  </script>
+</body>
+</html>

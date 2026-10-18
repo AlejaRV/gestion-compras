@@ -1,0 +1,6 @@
+{
+  "id": "#string",
+  "cantidad": "#number? _ > 0",
+  "valorUnitario": "#number? _ > 0",
+  "subtotal": "#number"
+}
