@@ -12,57 +12,57 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout del Código
+      - name: "📥 Checkout del Código"
         uses: actions/checkout@v4
 
-      - name: ☕ Configurar Java 17 (Temurin)
+      - name: "☕ Configurar Java 17 (Temurin)"
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
           cache: 'maven'
 
-      - name: 🔨 Compilar Proyecto
+      - name: "🔨 Compilar Proyecto"
         run: mvn clean compile -B
 
-      - name: 🧪 Ejecutar Pruebas Unitarias y Cobertura JaCoCo
+      - name: "🧪 Ejecutar Pruebas Unitarias y Cobertura JaCoCo"
         run: mvn test -DskipITs -B
 
-      - name: 📊 Quality Gate: Verificar Cobertura JaCoCo (Líneas y Ramas >= 80%)
+      - name: "📊 Quality Gate - Verificar Cobertura JaCoCo (Líneas y Ramas >= 80%)"
         run: mvn jacoco:check -B
 
-      - name: 🧬 Quality Gate: Mutation Testing con PITest (Score >= 70%)
+      - name: "🧬 Quality Gate - Mutation Testing con PITest (Score >= 70%)"
         run: mvn pitest:mutationCoverage -DskipITs -B
 
-      - name: 🥒 Ejecutar Pruebas de Aceptación con Karate Framework
+      - name: "🥒 Ejecutar Pruebas de Aceptación con Karate Framework"
         run: mvn test -Dtest=OrdersAcceptanceIT -B
 
-      - name: 🎭 Instalar Navegadores de Playwright
+      - name: "🎭 Instalar Navegadores de Playwright"
         run: npx -y playwright install --with-deps chromium
 
-      - name: 🖥️ Ejecutar Pruebas E2E de UI con Playwright
+      - name: "🖥️ Ejecutar Pruebas E2E de UI con Playwright"
         run: mvn test -Dtest=OrdersWebPlaywrightIT -B
 
-      - name: 📦 Construir Imagen Docker
+      - name: "📦 Construir Imagen Docker"
         run: |
           docker build -t challenge-api:latest .
           docker images
 
-      - name: 📤 Publicar Reporte JaCoCo
+      - name: "📤 Publicar Reporte JaCoCo"
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: jacoco-coverage-report
           path: target/site/jacoco/
 
-      - name: 📤 Publicar Reporte PITest (Mutation Testing)
+      - name: "📤 Publicar Reporte PITest (Mutation Testing)"
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: pitest-mutation-report
           path: target/pit-reports/
 
-      - name: 📤 Publicar Reporte Karate Framework
+      - name: "📤 Publicar Reporte Karate Framework"
         uses: actions/upload-artifact@v4
         if: always()
         with:
